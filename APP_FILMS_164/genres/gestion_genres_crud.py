@@ -34,7 +34,7 @@ def genres_afficher(order_by, id_genre_sel):
         try:
             with DBconnection() as mc_afficher:
                 if order_by == "ASC" and id_genre_sel == 0:
-                    strsql_genres_afficher = """SELECT id_personne,nom FROM t_personne ORDER BY id_personne ASC"""
+                    strsql_genres_afficher = """SELECT id,nom,prenom,date_naissance FROM t_personnes ORDER BY id ASC"""
                     mc_afficher.execute(strsql_genres_afficher)
                 elif order_by == "ASC":
                     # C'EST LA QUE VOUS ALLEZ DEVOIR PLACER VOTRE PROPRE LOGIQUE MySql
@@ -43,11 +43,11 @@ def genres_afficher(order_by, id_genre_sel):
                     # donc, je précise les champs à afficher
                     # Constitution d'un dictionnaire pour associer l'id du genre sélectionné avec un nom de variable
                     valeur_id_genre_selected_dictionnaire = {"value_id_genre_selected": id_genre_sel}
-                    strsql_genres_afficher = """SELECT id_personne,nom,date_naissance FROM t_personne WHERE id_genre = %(value_id_genre_selected)s"""
+                    strsql_genres_afficher = """SELECT id,nom,date_naissance FROM t_personnes WHERE id = %(value_id_selected)s"""
 
                     mc_afficher.execute(strsql_genres_afficher, valeur_id_genre_selected_dictionnaire)
                 else:
-                    strsql_genres_afficher = """SELECT id_personne,nom,prenom FROM t_personne ORDER BY id_personne DESC"""
+                    strsql_genres_afficher = """SELECT id,nom,prenom FROM t_personnes ORDER BY id DESC"""
 
                     mc_afficher.execute(strsql_genres_afficher)
 
@@ -106,7 +106,25 @@ def genres_ajouter_wtf():
                 valeurs_insertion_dictionnaire = {"value_intitule_genre": name_genre}
                 print("valeurs_insertion_dictionnaire ", valeurs_insertion_dictionnaire)
 
-                strsql_insert_genre = """INSERT INTO t_genre (id_genre,intitule_genre) VALUES (NULL,%(value_intitule_genre)s) """
+
+
+                strsql_insert_genre = """INSERT INTO t_personnes (id,nom,prenom,date_naissance) VALUES (NULL,%(value_intitule_genre)s) """
+                with DBconnection() as mconn_bd:
+                    mconn_bd.execute(strsql_insert_genre, valeurs_insertion_dictionnaire)
+
+                flash(f"Données insérées !!", "success")
+                print(f"Données insérées !!")
+
+                # Pour afficher et constater l'insertion de la valeur, on affiche en ordre inverse. (DESC)
+                return redirect(url_for('genres_afficher', order_by='DESC', id_genre_sel=0))
+
+            if form.validate_on_submit():
+                name_genre_wtf = form.nom_genre_wtf.data
+                name_genre = name_genre_wtf.lower()
+                valeurs_insertion_dictionnaire = {"value_intitule_genre": name_genre}
+                print("valeurs_insertion_dictionnaire ", valeurs_insertion_dictionnaire)
+
+                strsql_insert_genre = """INSERT INTO t_personnes (id_personnes,prenom) VALUES (NULL,%(value_intitule_genre)s) """
                 with DBconnection() as mconn_bd:
                     mconn_bd.execute(strsql_insert_genre, valeurs_insertion_dictionnaire)
 
@@ -166,8 +184,8 @@ def genre_update_wtf():
                                           }
             print("valeur_update_dictionnaire ", valeur_update_dictionnaire)
 
-            str_sql_update_intitulegenre = """UPDATE t_genre SET intitule_genre = %(value_name_genre)s, 
-            date_ins_genre = %(value_date_genre_essai)s WHERE id_genre = %(value_id_genre)s """
+            str_sql_update_intitulegenre = """UPDATE t_personnes SET intitule_genre = %(value_name_genre)s, 
+            date_ins_genre = %(value_date_genre_essai)s WHERE id_personnes = %(value_id_genre)s """
             with DBconnection() as mconn_bd:
                 mconn_bd.execute(str_sql_update_intitulegenre, valeur_update_dictionnaire)
 

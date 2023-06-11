@@ -9,7 +9,7 @@ try:
     """
         Une seule requête pour montrer la récupération des données de la BD en MySql.
     """
-    strsql_genres_afficher = """SELECT * FROM t_personne ORDER BY id_personne ASC"""
+    strsql_genres_afficher = """SELECT * FROM t_personnes ORDER BY id ASC"""
 
     with DBconnection() as db:
         db.execute(strsql_genres_afficher)
